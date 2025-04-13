@@ -1,0 +1,24 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="home-vue">
+    <h2>Ana Sayfa - Vue Entegrasyonu</h2>
+    <!-- Vue tarafından render edilecek dinamik içerik -->
+    <p>{{ message }}</p>
+    <button @@click ="changeMessage">Mesajı Değiştir</button>
+</div>
+
+<script>
+    // Vue instance'ını sadece bu view için tanımlıyoruz
+    new Vue({
+      el: '#home-vue',
+      data: {
+        message: 'Merhaba, stok yönetimi sistemine hoşgeldiniz!'
+      },
+      methods: {
+        changeMessage() {
+          this.message = 'Mesaj güncellendi!';
+        }
+      }
+    });
+</script>

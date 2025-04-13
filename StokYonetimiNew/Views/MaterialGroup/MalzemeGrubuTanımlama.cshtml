@@ -1,0 +1,45 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div id="material-group-vue">
+    <h2>Malzeme Grubu Tanýmlama</h2>
+    <form @@submit.prevent="submitMaterialGroup">
+        <div>
+            <label for="code">Kod Numarasý:</label>
+            <!-- Kod numarasý otomatik oluþturulmuþ, okunabilir alan -->
+            <input type="text" id="code" v-model="code" readonly />
+        </div>
+        <div>
+            <label for="categoryName">Ana Kategori Adý:</label>
+            <!-- Kullanýcý tarafýndan girilecek alan -->
+            <input type="text" id="categoryName" v-model="categoryName" required />
+        </div>
+        <button type="submit">Kaydet</button>
+    </form>
+    <div v-if="message">
+        <p>{{ message }}</p>
+    </div>
+</div>
+
+<script>
+    new Vue({
+      el: '#material-group-vue',
+      data: {
+        // Kod numarasý burada örnek olarak "01" olarak sabit;
+        // gerçekte otomatik sýralý üretim ya da sunucudan alýnabilir.
+        code: '01',
+        categoryName: '',
+        message: ''
+      },
+      methods: {
+        submitMaterialGroup() {
+          // Burada form verilerini backend API'sine gönderebilirsiniz.
+          // Örneðin, axios kullanarak POST isteði yapýlabilir.
+          // Þimdilik örnek mesaj gösteriyoruz.
+          this.message = 'Malzeme grubu baþarýyla kaydedildi: ' + this.categoryName;
+          // Formu temizleme
+          this.categoryName = '';
+        }
+      }
+    });
+</script>

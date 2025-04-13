@@ -1,0 +1,354 @@
+@{
+    ViewData["Title"] = "Tedarikçi Tanýmlarý";
+}
+<style scoped>
+.card {
+  border: none;
+  border-radius: 8px;
+}
+
+.card-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 1rem;
+}
+
+.table-responsive {
+  border-top: 1px solid #e9ecef;
+}
+
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+.btn-outline-info,
+.btn-outline-danger {
+  transition: transform 0.3s ease;
+}
+
+.btn-outline-info:hover,
+.btn-outline-danger:hover {
+  transform: scale(1.05);
+}
+</style>
+<body class="bg-white">
+
+
+    <div id="supplierApp" class="bg-white" style="margin-top:50px">
+    <div class="d-flex justify-content-between mb-4" style="margin-bottom:0px" >
+        <h2>Tedarikçi Tanýmlarý</h2>
+        
+    </div>
+    <hr style="border: none; border-top: 1px solid black; margin-top: 10px;">
+
+    <!-- Arama kýsmý -->
+        
+        <!-- Tedarikçi Arama ve Ekleme -->
+        <div class="row mb-4 align-items-center" style="margin-top:50px">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-dark">
+                        <i class="mdi mdi-magnify"></i>
+                    </span>
+                    <input type="text" class="form-control form-control-sm border-dark"
+                           v-model="searchQuery" placeholder="Tedarikçi ara..." style=" padding:25px; padding-top:12px;padding-bottom:12px; font-weight:600">
+                    <button class="btn btn-outline-dark btn-sm" type="button" @@click="searchSuppliers">
+                        Ara
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-dark" v-on:click="showCreateForm" style="margin-right:70px; padding:25px; padding-top:12px;padding-bottom:12px; font-weight:600">
+                    <i class="mdi mdi-plus"></i> Yeni Tedarikçi
+                </button>
+            </div>
+        </div>
+
+    <!-- Tedarikçi tablosu -->
+        <div class="card shadow-sm " >
+            <div class="card-header bg-light">
+                <h4 class="mb-0">Tedarikçi Listesi</h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Kýsa Ad</th>
+                                <th>Tam Ad</th>
+                                <th>Vergi No</th>
+                                <th>Adres</th>
+                                <th>Telefon</th>
+                                <th>Email</th>
+                                <th>Ýþlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="supplier in suppliers" :key="supplier.id">
+                                <td>{{ supplier.shortName }}</td>
+                                <td>{{ supplier.fullName }}</td>
+                                <td>{{ supplier.taxNumber }}</td>
+                                <td>{{ supplier.address }}</td>
+                                <td>{{ supplier.phone }}</td>
+                                <td>{{ supplier.email }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-light border border-dark rounded-2 me-1"
+                                    @@click ="editSupplier(supplier)">
+                                        <i class="mdi mdi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger border border-dark rounded-2"
+                                    @@click ="deleteSupplier(supplier)">
+                                        <i class="mdi mdi-delete"></i>
+                                    </button>
+                                </td>
+
+                            </tr>
+                            <tr v-if="suppliers.length === 0">
+                                <td colspan="7" class="text-center py-3">Hiç tedarikçi bulunamadý</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <!-- Tedarikçi Form Modal -->
+    <div class="modal fade" id="supplierModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{isEditing ? 'Tedarikçi Düzenle' : 'Yeni Tedarikçi Ekle'}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <form @@submit.prevent="saveSupplier">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Kýsa Ad *</label>
+                                <input type="text" class="form-control" v-model="currentSupplier.shortName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tam Ad *</label>
+                                <input type="text" class="form-control" v-model="currentSupplier.fullName" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Vergi No *</label>
+                                <input type="text" class="form-control" v-model="currentSupplier.taxNumber" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Telefon</label>
+                                <input type="tel" class="form-control" v-model="currentSupplier.phone">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" v-model="currentSupplier.email">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Adres</label>
+                            <textarea class="form-control" v-model="currentSupplier.address" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Açýklama</label>
+                            <textarea class="form-control" v-model="currentSupplier.notes" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Durum</label>
+                            <select class="form-select" v-model="currentSupplier.isActive">
+                                <option :value="true">Aktif</option>
+                                <option :value="false">Pasif</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Ýptal</button>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Silme Onay Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tedarikçi Sil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu tedarikçiyi silmek istediðinize emin misiniz?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ýptal</button>
+                    <button type="button" class="btn btn-danger" v-on:click="confirmDelete">Evet, Sil</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+@section Scripts {
+    <script src="~/lib/vue.global.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        suppliers: [],
+                        currentSupplier: {
+                            id: 0,
+                            shortName: '',
+                            fullName: '',
+                            taxNumber: '',
+                            address: '',
+                            phone: '',
+                            email: '',
+                            notes: '',
+                            isActive: true
+                        },
+                        supplierToDelete: null,
+                        isEditing: false,
+                        searchQuery: '',
+                        supplierModal: null,
+                        deleteModal: null
+                    };
+                },
+                mounted() {
+                    this.loadSuppliers();
+                    this.supplierModal = new bootstrap.Modal(document.getElementById('supplierModal'));
+                    this.deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                },
+                methods: {
+                    loadSuppliers: function() {
+                        // Normalde burasý bir API call olacak
+                        // axios.get('/api/suppliers').then(response => {
+                        //     this.suppliers = response.data;
+                        // });
+                        
+                        // Þimdilik test verisi kullanýyoruz
+                        this.suppliers = [
+                            {
+                                id: 1,
+                                shortName: 'ABC Ltd',
+                                fullName: 'ABC Limited Þirketi',
+                                taxNumber: '1234567890',
+                                address: 'Ýstanbul, Türkiye',
+                                phone: '0212 123 4567',
+                                email: 'info@abc.com',
+                                notes: 'Test tedarikçi',
+                                isActive: true
+                            },
+                            {
+                                id: 2,
+                                shortName: 'XYZ A.Þ.',
+                                fullName: 'XYZ Anonim Þirketi',
+                                taxNumber: '0987654321',
+                                address: 'Ankara, Türkiye',
+                                phone: '0312 987 6543',
+                                email: 'info@xyz.com',
+                                notes: 'Ana tedarikçi',
+                                isActive: true
+                            }
+                        ];
+                    },
+                    showCreateForm: function() {
+                        this.isEditing = false;
+                        this.currentSupplier = {
+                            id: 0,
+                            shortName: '',
+                            fullName: '',
+                            taxNumber: '',
+                            address: '',
+                            phone: '',
+                            email: '',
+                            notes: '',
+                            isActive: true
+                        };
+                        this.supplierModal.show();
+                    },
+                    editSupplier: function(supplier) {
+                        this.isEditing = true;
+                        this.currentSupplier = { ...supplier };
+                        this.supplierModal.show();
+                    },
+                    saveSupplier: function() {
+                        if (this.isEditing) {
+                            // PUT isteði yapýlacak - var olan kaydý güncelle
+                            // axios.put('/api/suppliers/' + this.currentSupplier.id, this.currentSupplier)
+                            //     .then(response => {
+                            //         this.loadSuppliers();
+                            //         this.supplierModal.hide();
+                            //     });
+                            
+                            // Þimdilik manuel güncelliyoruz
+                            const index = this.suppliers.findIndex(s => s.id === this.currentSupplier.id);
+                            if (index !== -1) {
+                                this.suppliers.splice(index, 1, this.currentSupplier);
+                            }
+                        } else {
+                            // POST isteði yapýlacak - yeni kayýt oluþtur
+                            // axios.post('/api/suppliers', this.currentSupplier)
+                            //     .then(response => {
+                            //         this.loadSuppliers();
+                            //         this.supplierModal.hide();
+                            //     });
+                            
+                            // Þimdilik manuel ekliyoruz
+                            const newId = Math.max(0, ...this.suppliers.map(s => s.id)) + 1;
+                            this.currentSupplier.id = newId;
+                            this.suppliers.push({ ...this.currentSupplier });
+                        }
+                        this.supplierModal.hide();
+                    },
+                    deleteSupplier: function(supplier) {
+                        this.supplierToDelete = supplier;
+                        this.deleteModal.show();
+                    },
+                    confirmDelete: function() {
+                        if (this.supplierToDelete) {
+                            // DELETE isteði yapýlacak
+                            // axios.delete('/api/suppliers/' + this.supplierToDelete.id)
+                            //     .then(response => {
+                            //         this.loadSuppliers();
+                            //         this.deleteModal.hide();
+                            //     });
+                            
+                            // Þimdilik manuel siliyoruz
+                            const index = this.suppliers.findIndex(s => s.id === this.supplierToDelete.id);
+                            if (index !== -1) {
+                                this.suppliers.splice(index, 1);
+                            }
+                            this.deleteModal.hide();
+                        }
+                    },
+                    searchSuppliers: function() {
+                        if (!this.searchQuery.trim()) {
+                            this.loadSuppliers();
+                            return;
+                        }
+                        
+                        // Normalde bir API call yapýlýr
+                        // axios.get('/api/suppliers/search?q=' + encodeURIComponent(this.searchQuery))
+                        //     .then(response => {
+                        //         this.suppliers = response.data;
+                        //     });
+                        
+                        // Þimdilik basit bir client-side arama yapýyoruz
+                        this.loadSuppliers(); // Önce tüm verileri yükle
+                        const query = this.searchQuery.toLowerCase();
+                        this.suppliers = this.suppliers.filter(s => 
+                            s.shortName.toLowerCase().includes(query) || 
+                            s.fullName.toLowerCase().includes(query) || 
+                            s.taxNumber.includes(query)
+                        );
+                    }
+                }
+            });
+            app.mount('#supplierApp');
+        });
+    </script>
+
+}
