@@ -1,212 +1,214 @@
 @{
     ViewData["Title"] = "Malzeme Grup Tanımları";
 }
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
 
+     .fs-7 {
+         font-size: 0.875rem !important;
+     }
+     /* 14px */
+     .fs-8 {
+         font-size: 0.75rem !important;
+     }
+     /* 12px */
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
+<div id="materialGroupApp" class="container py-4" v-cloak>
+    <h2>@ViewData["Title"]</h2>
 
-
-
-
-
-    <div id="materialGroupApp" style="margin-top:50px">
-        <div class="d-flex justify-content-between mb-4" style="margin-bottom:0px">
-            <h2>Malzeme Grup Tanımları</h2>
-        
-
-    </div>
-    <hr style="border: none; border-top: 1px solid black; margin-top: 10px; margin-bottom:30px">
-
-    <div class="d-flex justify-content-end" style="margin-top: 10px; margin-bottom:30px">
-        <button class="btn btn-outline-dark me-2" v-on:click="showCreateMainCategoryForm" style="margin-right:70px; padding:25px; padding-top:12px;padding-bottom:12px; font-weight:600">
-            <i class="mdi mdi-plus"></i> Yeni Ana Kategori
+    <div class="mb-4 d-flex">
+        <button type="button" class="btn btn-outline-dark me-2" v-on:click="showCreateMainCategoryForm">
+            Yeni Ana Kategori
         </button>
-        <button class="btn btn-dark" v-on:click="showCreateSubCategoryForm" style="margin-right:70px; padding:25px; padding-top:12px;padding-bottom:12px; font-weight:600">
-            <i class="mdi mdi-plus"></i> Yeni Alt Kategori
+        <button type="button" class="btn btn-dark me-2" v-on:click="showCreateSubCategoryForm">
+            Yeni Alt Kategori
+        </button>
+        <button type="button" class="btn btn-primary" v-on:click="showCreateProductTypeForm">
+            Yeni Malzeme/Ürün Türü
         </button>
     </div>
-
 
     <div class="row">
-        <!-- Ana Kategoriler ve Alt Kategoriler -->
-        <div class="col-md-5">
+        <!-- Ana Kategoriler -->
+        <div class="col-md-4">
             <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Ana Kategoriler</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        <a href="#" class="list-group-item list-group-item-action"
-                           v-for="category in mainCategories" 
-                           :key="category.id"
-                           :class="{'active': selectedMainCategory && selectedMainCategory.id === category.id}"
-                           v-on:click="selectMainCategory(category)">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="badge bg-secondary me-2">{{category.code}}</span>
-                                    {{category.name}}
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-light border border-dark rounded-2 me-1"
-                                            v-on:click.stop="editMainCategory(category)">
-                                        <i class="mdi mdi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger border border-dark rounded-2"
-                                            v-on:click.stop="deleteMainCategory(category)">
-                                        <i class="mdi mdi-delete"></i>
-                                    </button>
-                                </div>
-
-                            </div>
-                        </a>
-                        <div v-if="mainCategories.length === 0" class="text-center py-3">
-                            Hiç ana kategori bulunamadı.
-                        </div>
-                    </div>
-                </div>
+                <div class="card-header">Ana Kategoriler</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"
+                        v-for="cat in mainCategories"
+                        :key="cat.id"
+                        :class="{active: selectedMainCategory?.id===cat.id}"
+                        v-on:click="selectMainCategory(cat)">
+                        <span class="badge bg-secondary me-2">{{cat.code}}</span>{{cat.name}}
+                        <span class="float-end">
+                            <button type="button" class="btn btn-sm btn-light me-1" v-on:click.stop="editMainCategory(cat)">✎</button>
+                            <button type="button" class="btn btn-sm btn-danger" v-on:click.stop="deleteMainCategory(cat)">🗑</button>
+                        </span>
+                    </li>
+                    <li v-if="mainCategories.length===0" class="list-group-item text-center">
+                        Hiç ana kategori yok
+                    </li>
+                </ul>
             </div>
         </div>
 
-        <div class="col-md-7">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Alt Kategoriler</h5>
-                </div>
-                <div class="card-body">
-                    <div v-if="!selectedMainCategory" class="text-center py-3">
-                        Alt kategorileri görmek için bir ana kategori seçin.
-                    </div>
-                    <div v-else>
-                        <h6 class="mb-3">
-                            <span class="badge bg-secondary me-2">{{selectedMainCategory.code}}</span>
-                            {{selectedMainCategory.name}} - Alt Kategorileri
-                        </h6>
-                        <div class="list-group">
-                            <a href="#" class="list-group-item list-group-item-action"
-                               v-for="subcategory in filteredSubCategories" 
-                               :key="subcategory.id"
-                               :class="{'active': selectedSubCategory && selectedSubCategory.id === subcategory.id}"
-                               v-on:click="selectSubCategory(subcategory)">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="badge bg-info me-2">{{subcategory.code}}</span>
-                                        {{subcategory.name}}
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-sm btn-light border border-dark rounded-2 me-1"
-                                                v-on:click.stop="editSubCategory(subcategory)">
-                                            <i class="mdi mdi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger border border-dark rounded-2"
-                                                v-on:click.stop="deleteSubCategory(subcategory)">
-                                            <i class="mdi mdi-delete"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </a>
-                            <div v-if="filteredSubCategories.length === 0" class="text-center py-3">
-                                Bu ana kategoride hiç alt kategori bulunmamaktadır.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Alt Kategoriler -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">Alt Kategoriler</div>
+                <div class="card-body" v-if="!selectedMainCategory">Bir ana kategori seçin</div>
+                <ul class="list-group list-group-flush" v-else>
+                    <li class="list-group-item"
+                        v-for="sub in filteredSubCategories"
+                        :key="sub.id"
+                        :class="{active: selectedSubCategory?.id===sub.id}"
+                        v-on:click="selectSubCategory(sub)">
+                        <span class="badge bg-info me-2">{{sub.code}}</span>{{sub.name}}
+                        <span class="float-end">
+                            <button type="button" class="btn btn-sm btn-light me-1" v-on:click.stop="editSubCategory(sub)">✎</button>
+                            <button type="button" class="btn btn-sm btn-danger" v-on:click.stop="deleteSubCategory(sub)">🗑</button>
+                        </span>
+                    </li>
+                    <li v-if="filteredSubCategories.length===0" class="list-group-item text-center">
+                        Bu kategoride alt kategori yok
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Malzeme/Ürün Türleri -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">Malzeme/Ürün Türleri</div>
+                <div class="card-body" v-if="!selectedSubCategory">Bir alt kategori seçin</div>
+                <ul class="list-group list-group-flush" v-else>
+                    <li class="list-group-item"
+                        v-for="pt in filteredProductTypes"
+                        :key="pt.id"
+                        :class="{active: selectedProductType?.id===pt.id}"
+                        v-on:click="selectProductType(pt)">
+                        <span class="badge bg-warning me-2">{{pt.code}}</span>{{pt.name}}
+                        <span class="float-end">
+                            <button type="button" class="btn btn-sm btn-light me-1" v-on:click.stop="editProductType(pt)">✎</button>
+                            <button type="button" class="btn btn-sm btn-danger" v-on:click.stop="deleteProductType(pt)">🗑</button>
+                        </span>
+                    </li>
+                    <li v-if="filteredProductTypes.length===0" class="list-group-item text-center">
+                        Bu alt kategoride malzeme/ürün türü yok
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 
+    <!-- Modaller -->
     <!-- Ana Kategori Modal -->
-    <div class="modal fade" id="mainCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="mainCategoryModal" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <form class="modal-content" v-on:submit.prevent="saveMainCategory">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{isEditingMainCategory ? 'Ana Kategori Düzenle' : 'Yeni Ana Kategori Ekle'}}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    <h5 class="modal-title">{{ isEditingMainCategory ? 'Düzenle' : 'Yeni Ana Kategori' }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form @@submit.prevent="saveMainCategory">
-                        <!--   <div class="mb-3">
-                            <label class="form-label">Kategori Kodu *</label>
-                            <input type="text" class="form-control" v-model="currentMainCategory.code" required maxlength="2" :readonly="isEditingMainCategory">
-                            <small class="text-muted" v-if="!isEditingMainCategory">İki haneli kod girin (01-99)</small>
-                        </div> -->
-                        <div class="mb-3">
-                            <label class="form-label">Kategori Adı *</label>
-                            <input type="text" class="form-control" v-model="currentMainCategory.name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Açıklama</label>
-                            <textarea class="form-control" v-model="currentMainCategory.description" rows="2"></textarea>
-                        </div>
-                        <div class="text-end">
-                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">İptal</button>
-                            <button type="submit" class="btn btn-primary">Kaydet</button>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label class="form-label">Kod *</label>
+                        <input v-model="currentMainCategory.code" class="form-control" readonly maxlength="2" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ad *</label>
+                        <input v-model="currentMainCategory.name" class="form-control" required maxlength="100" />
+                    </div>
                 </div>
-            </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- Alt Kategori Modal -->
-    <div class="modal fade" id="subCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="subCategoryModal" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <form class="modal-content" v-on:submit.prevent="saveSubCategory">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{isEditingSubCategory ? 'Alt Kategori Düzenle' : 'Yeni Alt Kategori Ekle'}}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    <h5 class="modal-title">{{ isEditingSubCategory ? 'Düzenle' : 'Yeni Alt Kategori' }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form @@submit.prevent="saveSubCategory">
-                        <div class="mb-3">
-                            <label class="form-label">Ana Kategori *</label>
-                            <select class="form-select" v-model="currentSubCategory.mainCategoryId" required :disabled="isEditingSubCategory">
-                                <option v-for="category in mainCategories" :key="category.id" :value="category.id">
-                                    {{category.code}} - {{category.name}}
-                                </option>
-                            </select>
-                        </div>
-                        <!-- <div class="mb-3">
-                            <label class="form-label">Alt Kategori Kodu *</label>
-                            <input type="text" class="form-control" v-model="currentSubCategory.code" required maxlength="5" :readonly="isEditingSubCategory">
-                            <small class="text-muted" v-if="!isEditingSubCategory">Format: Ana kategori kodu + İki haneli kod (örn: 01.01)</small>
-                        </div>-->
-                        <div class="mb-3">
-                            <label class="form-label">Alt Kategori Adı *</label>
-                            <input type="text" class="form-control" v-model="currentSubCategory.name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Açıklama</label>
-                            <textarea class="form-control" v-model="currentSubCategory.description" rows="2"></textarea>
-                        </div>
-                        <div class="text-end">
-                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">İptal</button>
-                            <button type="submit" class="btn btn-primary">Kaydet</button>
-                        </div>
-                    </form>
+                    <div class="mb-3">
+                        <label class="form-label">Kod *</label>
+                        <input v-model="currentSubCategory.code" class="form-control" readonly maxlength="4" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ad *</label>
+                        <input v-model="currentSubCategory.name" class="form-control" required maxlength="100" />
+                    </div>
                 </div>
-            </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Silme Onay Modal -->
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <!-- Malzeme/Ürün Türü Modal -->
+    <div class="modal fade" id="productTypeModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" v-on:submit.prevent="saveProductType">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ isEditingProductType ? 'Düzenle' : 'Yeni Tür' }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Kod *</label>
+                        <input v-model="currentProductType.code" class="form-control" readonly maxlength="7" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ad *</label>
+                        <input v-model="currentProductType.name" class="form-control" required maxlength="100" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Silme Onayı Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{deleteTarget === 'main' ? 'Ana Kategori Sil' : 'Alt Kategori Sil'}}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    <h5 class="modal-title">
+                        {{
+                        deleteTarget==='main' ? 'Ana Kategori Sil'
+                        : deleteTarget==='sub'  ? 'Alt Kategori Sil'
+                        :                          'Tür Sil'
+                        }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p v-if="deleteTarget === 'main'">
-                        Bu ana kategoriyi silmek istediğinize emin misiniz? Bu işlem alt kategorileri de silecektir.
+                    <p v-if="deleteTarget==='main'">
+                        Bu ana kategoriyi ve tüm alt kategorilerini silmek istediğinize emin misiniz?
+                    </p>
+                    <p v-else-if="deleteTarget==='sub'">
+                        Bu alt kategoriyi ve türlerini silmek istediğinize emin misiniz?
                     </p>
                     <p v-else>
-                        Bu alt kategoriyi silmek istediğinize emin misiniz?
+                        Bu türü silmek istediğinize emin misiniz?
                     </p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-danger" v-on:click="confirmDelete">Evet, Sil</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button class="btn btn-danger" v-on:click="confirmDelete">Evet, Sil</button>
                 </div>
             </div>
         </div>
@@ -214,245 +216,193 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="~/lib/vue.global.js"></script>
-
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const app = Vue.createApp({
-                data() {
-                    return {
-                        mainCategories: [],
-                        subCategories: [],
-                        currentMainCategory: {
-                            id: 0,
-                            code: '',
-                            name: '',
-                            description: ''
-                        },
-                        currentSubCategory: {
-                            id: 0,
-                            mainCategoryId: 0,
-                            code: '',
-                            name: '',
-                            description: ''
-                        },
-                        selectedMainCategory: null,
-                        selectedSubCategory: null,
-                        isEditingMainCategory: false,
-                        isEditingSubCategory: false,
-                        deleteTarget: 'main',
-                        itemToDelete: null,
-                        mainCategoryModal: null,
-                        subCategoryModal: null,
-                        deleteModal: null
-                    }
-                },
-                computed: {
-                    filteredSubCategories() {
-                        if (!this.selectedMainCategory) return [];
-                        return this.subCategories.filter(sc => sc.mainCategoryId === this.selectedMainCategory.id);
-                    }
-                },
-                mounted: function() {
-                    this.loadData();
-                    this.mainCategoryModal = new bootstrap.Modal(document.getElementById('mainCategoryModal'));
-                    this.subCategoryModal = new bootstrap.Modal(document.getElementById('subCategoryModal'));
-                    this.deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-                },
-                methods: {
-                    loadData: function() {
-                        // Ana kategorileri yükle
-                        // axios.get('/api/main-categories').then(response => {
-                        //     this.mainCategories = response.data;
-                        // });
-                        
-                        // Alt kategorileri yükle
-                        // axios.get('/api/sub-categories').then(response => {
-                        //     this.subCategories = response.data;
-                        // });
-                        
-                        // Şimdilik test verisi kullanıyoruz
-                        this.mainCategories = [
-                            { id: 1, code: '01', name: 'Elektronik', description: 'Elektronik ürünler' },
-                            { id: 2, code: '02', name: 'Mekanik', description: 'Mekanik parçalar' },
-                            { id: 3, code: '03', name: 'Ofis', description: 'Ofis malzemeleri' }
-                        ];
-                        
-                        this.subCategories = [
-                            { id: 1, mainCategoryId: 1, code: '01.01', name: 'Bilgisayarlar', description: 'PC, Laptop' },
-                            { id: 2, mainCategoryId: 1, code: '01.02', name: 'Telefonlar', description: 'Mobil cihazlar' },
-                            { id: 3, mainCategoryId: 2, code: '02.01', name: 'Motorlar', description: 'DC ve AC motorlar' },
-                            { id: 4, mainCategoryId: 3, code: '03.01', name: 'Kağıt Ürünleri', description: 'Kağıt, defter, vs.' }
-                        ];
-                    },
-                    
-                    // Ana Kategori İşlemleri
-                    selectMainCategory: function(category) {
-                        this.selectedMainCategory = category;
-                        this.selectedSubCategory = null;
-                    },
-                    showCreateMainCategoryForm: function() {
-                        this.isEditingMainCategory = false;
-                        this.currentMainCategory = {
-                            id: 0,
-                            code: '',
-                            name: '',
-                            description: ''
-                        };
-                        this.mainCategoryModal.show();
-                    },
-                    editMainCategory: function(category) {
-                        this.isEditingMainCategory = true;
-                        this.currentMainCategory = { ...category };
-                        this.mainCategoryModal.show();
-                    },
-                    saveMainCategory: function() {
-                        if (this.isEditingMainCategory) {
-                            // PUT isteği - güncelleme
-                            // axios.put('/api/main-categories/' + this.currentMainCategory.id, this.currentMainCategory)
-                            //     .then(response => {
-                            //         this.loadData();
-                            //         this.mainCategoryModal.hide();
-                            //     });
-                            
-                            // Şimdilik manuel güncelleme
-                            const index = this.mainCategories.findIndex(c => c.id === this.currentMainCategory.id);
-                            if (index !== -1) {
-                                this.mainCategories.splice(index, 1, {...this.currentMainCategory});
-                                if (this.selectedMainCategory && this.selectedMainCategory.id === this.currentMainCategory.id) {
-                                    this.selectedMainCategory = {...this.currentMainCategory};
-                                }
-                            }
-                        } else {
-                            // POST isteği - yeni ekleme
-                            // axios.post('/api/main-categories', this.currentMainCategory)
-                            //     .then(response => {
-                            //         this.loadData();
-                            //         this.mainCategoryModal.hide();
-                            //     });
-                            
-                            // Şimdilik manuel ekleme
-                            const newId = Math.max(0, ...this.mainCategories.map(c => c.id)) + 1;
-                            this.currentMainCategory.id = newId;
-                            this.mainCategories.push({...this.currentMainCategory});
-                        }
-                        this.mainCategoryModal.hide();
-                    },
-                    deleteMainCategory: function(category) {
-                        this.deleteTarget = 'main';
-                        this.itemToDelete = category;
-                        this.deleteModal.show();
-                    },
-                    
-                    // Alt Kategori İşlemleri
-                    selectSubCategory: function(subcategory) {
-                        this.selectedSubCategory = subcategory;
-                    },
-                    showCreateSubCategoryForm: function() {
-                        this.isEditingSubCategory = false;
-                        this.currentSubCategory = {
-                            id: 0,
-                            mainCategoryId: this.selectedMainCategory ? this.selectedMainCategory.id : 0,
-                            code: this.selectedMainCategory ? this.selectedMainCategory.code + '.01' : '',
-                            name: '',
-                            description: ''
-                        };
-                        this.subCategoryModal.show();
-                    },
-                    editSubCategory: function(subcategory) {
-                        this.isEditingSubCategory = true;
-                        this.currentSubCategory = { ...subcategory };
-                        this.subCategoryModal.show();
-                    },
-                    saveSubCategory: function() {
-                        if (this.isEditingSubCategory) {
-                            // PUT isteği - güncelleme
-                            // axios.put('/api/sub-categories/' + this.currentSubCategory.id, this.currentSubCategory)
-                            //     .then(response => {
-                            //         this.loadData();
-                            //         this.subCategoryModal.hide();
-                            //     });
-                            
-                            // Şimdilik manuel güncelleme
-                            const index = this.subCategories.findIndex(sc => sc.id === this.currentSubCategory.id);
-                            if (index !== -1) {
-                                this.subCategories.splice(index, 1, {...this.currentSubCategory});
-                                if (this.selectedSubCategory && this.selectedSubCategory.id === this.currentSubCategory.id) {
-                                    this.selectedSubCategory = {...this.currentSubCategory};
-                                }
-                            }
-                        } else {
-                            // POST isteği - yeni ekleme
-                            // axios.post('/api/sub-categories', this.currentSubCategory)
-                            //     .then(response => {
-                            //         this.loadData();
-                            //         this.subCategoryModal.hide();
-                            //     });
-                            
-                            // Şimdilik manuel ekleme
-                            const newId = Math.max(0, ...this.subCategories.map(sc => sc.id)) + 1;
-                            this.currentSubCategory.id = newId;
-                            this.subCategories.push({...this.currentSubCategory});
-                        }
-                        this.subCategoryModal.hide();
-                    },
-                    deleteSubCategory: function(subcategory) {
-                        this.deleteTarget = 'sub';
-                        this.itemToDelete = subcategory;
-                        this.deleteModal.show();
-                    },
-                    
-                    // Silme İşlemleri
-                    confirmDelete: function() {
-                        if (this.deleteTarget === 'main' && this.itemToDelete) {
-                            // Ana kategori silme
-                            // axios.delete('/api/main-categories/' + this.itemToDelete.id)
-                            //     .then(response => {
-                            //         this.loadData();
-                            //         this.deleteModal.hide();
-                            //     });
-                            
-                            // Şimdilik manuel silme
-                            const index = this.mainCategories.findIndex(c => c.id === this.itemToDelete.id);
-                            if (index !== -1) {
-                                this.mainCategories.splice(index, 1);
-                                
-                                // Bağlı alt kategorileri de sil
-                                this.subCategories = this.subCategories.filter(sc => sc.mainCategoryId !== this.itemToDelete.id);
-                                
-                                // Seçili kategori silinirse seçimi kaldır
-                                if (this.selectedMainCategory && this.selectedMainCategory.id === this.itemToDelete.id) {
-                                    this.selectedMainCategory = null;
-                                    this.selectedSubCategory = null;
-                                }
-                            }
-                        } else if (this.deleteTarget === 'sub' && this.itemToDelete) {
-                            // Alt kategori silme
-                            // axios.delete('/api/sub-categories/' + this.itemToDelete.id)
-                            //     .then(response => {
-                            //         this.loadData();
-                            //         this.deleteModal.hide();
-                            //     });
-                            
-                            // Şimdilik manuel silme
-                            const index = this.subCategories.findIndex(sc => sc.id === this.itemToDelete.id);
-                            if (index !== -1) {
-                                this.subCategories.splice(index, 1);
-                                
-                                // Seçili alt kategori silinirse seçimi kaldır
-                                if (this.selectedSubCategory && this.selectedSubCategory.id === this.itemToDelete.id) {
-                                    this.selectedSubCategory = null;
-                                }
-                            }
-                        }
-                        this.deleteModal.hide();
-                        this.itemToDelete = null;
-                    }
-                }
-            });
-            app.mount('#materialGroupApp');
+        const app = Vue.createApp({
+          data() {
+            return {
+              mainCategories: [],
+              subCategories: [],
+              productTypes: [],
+
+              currentMainCategory:  { id:0, code:'',   name:'' },
+              currentSubCategory:   { id:0, mainCategoryId:0, code:'',   name:'' },
+              currentProductType:   { id:0, subCategoryId:0,   code:'',   name:'' },
+
+              selectedMainCategory:  null,
+              selectedSubCategory:   null,
+              selectedProductType:   null,
+
+              isEditingMainCategory: false,
+              isEditingSubCategory:  false,
+              isEditingProductType:  false,
+
+              deleteTarget: 'main',
+              itemToDelete:  null,
+
+              modal: { main:null, sub:null, product:null, delete:null }
+            }
+          },
+          computed: {
+            filteredSubCategories() {
+              return this.subCategories.filter(sc => sc.mainCategoryId === this.selectedMainCategory?.id);
+            },
+            filteredProductTypes() {
+              return this.productTypes.filter(pt => pt.subCategoryId === this.selectedSubCategory?.id);
+            }
+          },
+          mounted() {
+            this.modal.main    = new bootstrap.Modal(document.getElementById('mainCategoryModal'));
+            this.modal.sub     = new bootstrap.Modal(document.getElementById('subCategoryModal'));
+            this.modal.product = new bootstrap.Modal(document.getElementById('productTypeModal'));
+            this.modal.delete  = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            this.loadAll();
+          },
+          methods: {
+            // — Load
+            async loadAll() {
+              this.mainCategories = (await axios.get('/api/MainCategoriesApi')).data;
+              this.subCategories  = (await axios.get('/api/SubCategoriesApi')).data;
+              this.productTypes   = (await axios.get('/api/ProductTypesApi')).data;
+            },
+
+            // — Seçimler
+            selectMainCategory(c) {
+              this.selectedMainCategory = c; this.selectedSubCategory = null; this.selectedProductType = null;
+            },
+            selectSubCategory(sc) {
+              this.selectedSubCategory = sc; this.selectedProductType = null;
+            },
+            selectProductType(pt) {
+              this.selectedProductType = pt;
+            },
+
+            // — Kod üreticileri
+            generateNextMainCode() {
+              const nums = this.mainCategories.map(c => +c.code);
+              const next = nums.length ? Math.max(...nums)+1 : 1;
+              return String(next).padStart(2,'0');
+            },
+            generateNextSubCode() {
+              const p = this.selectedMainCategory.code;
+              const nums = this.subCategories
+                .filter(sc => sc.mainCategoryId===this.selectedMainCategory.id)
+                .map(sc => +sc.code.slice(p.length));
+              const next = nums.length ? Math.max(...nums)+1 : 1;
+              return p + String(next).padStart(2,'0');
+            },
+            generateNextProductTypeCode() {
+              const p = this.selectedSubCategory.code;
+              const nums = this.productTypes
+                .filter(pt => pt.subCategoryId===this.selectedSubCategory.id)
+                .map(pt => +pt.code.slice(p.length));
+              const next = nums.length ? Math.max(...nums)+1 : 1;
+              return p + String(next).padStart(3,'0');
+            },
+
+            // — Ana Kategori CRUD
+            showCreateMainCategoryForm() {
+              this.isEditingMainCategory = false;
+              this.currentMainCategory = { id:0, code:this.generateNextMainCode(), name:'' };
+              this.modal.main.show();
+            },
+            editMainCategory(c) {
+              this.isEditingMainCategory = true;
+              this.currentMainCategory = { ...c };
+              this.modal.main.show();
+            },
+            async saveMainCategory() {
+              if (this.isEditingMainCategory) {
+                await axios.put(`/api/MainCategoriesApi/${this.currentMainCategory.id}`, this.currentMainCategory);
+              } else {
+                await axios.post('/api/MainCategoriesApi', this.currentMainCategory);
+              }
+              this.modal.main.hide();
+              await this.loadAll();
+            },
+            deleteMainCategory(c) {
+              this.deleteTarget='main'; this.itemToDelete=c;
+              this.modal.delete.show();
+            },
+
+            // — Alt Kategori CRUD
+            showCreateSubCategoryForm() {
+              if (!this.selectedMainCategory) return alert('Önce ana kategori seçin');
+              this.isEditingSubCategory=false;
+              this.currentSubCategory = {
+                id:0,
+                mainCategoryId:this.selectedMainCategory.id,
+                code:this.generateNextSubCode(),
+                name:''
+              };
+              this.modal.sub.show();
+            },
+            editSubCategory(sc) {
+              this.isEditingSubCategory=true;
+              this.currentSubCategory={...sc};
+              this.modal.sub.show();
+            },
+            async saveSubCategory() {
+              if (this.isEditingSubCategory) {
+                await axios.put(`/api/SubCategoriesApi/${this.currentSubCategory.id}`, this.currentSubCategory);
+              } else {
+                await axios.post('/api/SubCategoriesApi', this.currentSubCategory);
+              }
+              this.modal.sub.hide();
+              await this.loadAll();
+            },
+            deleteSubCategory(sc) {
+              this.deleteTarget='sub'; this.itemToDelete=sc;
+              this.modal.delete.show();
+            },
+
+            // — Tür CRUD
+            showCreateProductTypeForm() {
+              if (!this.selectedSubCategory) return alert('Önce alt kategori seçin');
+              this.isEditingProductType=false;
+              this.currentProductType = {
+                id:0,
+                subCategoryId:this.selectedSubCategory.id,
+                code:this.generateNextProductTypeCode(),
+                name:''
+              };
+              this.modal.product.show();
+            },
+            editProductType(pt) {
+              this.isEditingProductType=true;
+              this.currentProductType={...pt};
+              this.modal.product.show();
+            },
+            async saveProductType() {
+              if (this.isEditingProductType) {
+                await axios.put(`/api/ProductTypesApi/${this.currentProductType.id}`, this.currentProductType);
+              } else {
+                await axios.post('/api/ProductTypesApi', this.currentProductType);
+              }
+              this.modal.product.hide();
+              await this.loadAll();
+            },
+            deleteProductType(pt) {
+              this.deleteTarget='product'; this.itemToDelete=pt;
+              this.modal.delete.show();
+            },
+
+            // — Silme onayı
+            async confirmDelete() {
+              if (this.deleteTarget==='main') {
+                await axios.delete(`/api/MainCategoriesApi/${this.itemToDelete.id}`);
+              } else if (this.deleteTarget==='sub') {
+                await axios.delete(`/api/SubCategoriesApi/${this.itemToDelete.id}`);
+              } else {
+                await axios.delete(`/api/ProductTypesApi/${this.itemToDelete.id}`);
+              }
+              this.modal.delete.hide();
+              await this.loadAll();
+            }
+          }
         });
+        app.mount('#materialGroupApp');
     </script>
 }

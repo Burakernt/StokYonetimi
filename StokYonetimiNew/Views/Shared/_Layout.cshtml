@@ -1,16 +1,15 @@
 ﻿<style>
     .nav-link.active {
-        background-color: black !important; /* örnek: yeşil */
+        background-color: black !important; /* örnek: siyah arkaplan */
         color: #ffffff !important; /* yazı beyaz */
     }
 </style>
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title class="text-black" style="color:  black">@ViewData["Title"] - Envanter Yönetim Sistemi</title>
+    <title class="text-black" style="color: black">@ViewData["Title"] - Envanter Yönetim Sistemi</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,71 +20,151 @@
     <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
-
 <body>
-
-    <!-- Üstte sabit kullanıcı bilgisi componenti -->
-    <div class="position-fixed" style="top: 20px; right: 20px; z-index: 1050;">
-        <button class="btn btn-outline-dark btn-lg rounded-pill"
-                style="width: 250px; overflow: hidden; padding: 0.75rem 2rem;">
-            <div class="d-flex align-items-center justify-content-between w-100">
-                <span class="d-block text-truncate">Burak Eren Tan</span>
-                <i class="mdi mdi-logout text-dark " style="cursor: pointer; font-size: 1.5rem;"></i>
-            </div>
-        </button>
-    </div>
-
-
-
-
 
 
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
+            <!-- sidebar -->
             <div class="col-md-3 col-lg-2 p-0 bg-light sidebar">
-                <div class="d-flex flex-column flex-shrink-0 p-3 text-black  vh-100" style="background-color: #fdfdfd; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; ">
-                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none" style="font-family: 'Barlow'; font-size: 132px; text-align: center;">
+                <div class="d-flex flex-column flex-shrink-0 p-3 text-black vh-100"
+                     style="background-color:#fdfdfd; box-shadow:rgba(149,157,165,0.2) 0px 8px 24px;">
+                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"
+                       style="font-family:'Barlow'; font-size:132px; text-align:center;">
                         <img src="/logo/ExLogo.png" alt="Logo" width="40" height="40" class="me-2" />
-                        <span class="fs-1" >Örnek Hırdavat</span>
+                        <span class="fs-1">Örnek Hırdavat</span>
                     </a>
                     <hr>
                     <ul class="nav nav-pills flex-column mb-auto" id="sidebarMenu">
                         <li class="nav-item">
-                            <a href="/" class='nav-link text-black @(ViewContext.RouteData.Values["action"].ToString() == "Index" && ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active" : "")' style="height: 60px; display: flex; align-items: center;border-radius: 25px;">
-                                <i class="mdi mdi-view-dashboard me-2"></i>
-                                Ana Sayfa
+                            <a href="/"
+                               class="nav-link text-black @(ViewContext.RouteData.Values["action"].ToString() == "Index" && ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active" : "")"
+                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                <i class="mdi mdi-home me-2"></i> Ana Sayfa
                             </a>
                         </li>
-                        <li>
-                            <a href="/Supplier" class='nav-link text-black @(ViewContext.RouteData.Values["controller"].ToString() == "Supplier" ? "active" : "")' style="height: 60px; display: flex; align-items: center; border-radius: 25px;">
-                                <i class="mdi mdi-truck me-2"></i>
-                                Tedarikçi Tanımları
+
+                        <li class="nav-item">
+                            <a class="nav-link text-black"
+                               href="#tanımlamalarSubmenu"
+                               data-bs-toggle="collapse"
+                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                <i class="mdi mdi-database me-2"></i> Tanımlamalar
+                                <i class="mdi mdi-chevron-down ms-auto"></i>
                             </a>
+                            <ul class="nav flex-column collapse @(
+                                    ViewContext.RouteData.Values["controller"].ToString() == "Suppliers" ||
+                                    ViewContext.RouteData.Values["controller"].ToString() == "MaterialGroup" ||
+                                    ViewContext.RouteData.Values["controller"].ToString() == "Materials" ||
+                                    ViewContext.RouteData.Values["controller"].ToString() == "CustomerTeams"
+                                    ? "show" : "")"
+                                id="tanımlamalarSubmenu">
+                                <li class="nav-item">
+                                    <a href="/Suppliers"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "Suppliers" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-truck me-2"></i> Tedarikçi Tanımları
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/MaterialGroup"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "MaterialGroup" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-folder me-2"></i> Malzeme Grup Tanımları
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Materials"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "Materials" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-package me-2"></i> Malzeme/Ürün Tanımları
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/CustomerTeams"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "CustomerTeams" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-account-group me-2"></i> Müşteri/Ekip Tanımları
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
-                        <li>
-                            <a href="/MaterialGroup" class='nav-link text-black @(ViewContext.RouteData.Values["controller"].ToString() == "MaterialGroup" ? "active" : "")' style="height: 60px; display: flex; align-items: center;border-radius: 25px;">
-                                <i class="mdi mdi-shape me-2"></i>
-                                Malzeme Grup Tanımları
+
+                        <li class="nav-item">
+                            <a class="nav-link text-black"
+                               href="#veriGirisSubmenu"
+                               data-bs-toggle="collapse"
+                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                <i class="mdi mdi-transfer me-2"></i> Veri Giriş/Çıkış
+                                <i class="mdi mdi-chevron-down ms-auto"></i>
                             </a>
+                            <ul class="nav flex-column collapse @(
+                                    ViewContext.RouteData.Values["controller"].ToString() == "VeriGiris"
+                                    ? "show" : "")"
+                                id="veriGirisSubmenu">
+                                <li class="nav-item">
+                                    <a href="/MaterialEntries"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MalzemeGiris" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-arrow-down-bold me-2"></i> Malzeme/Ürün Girişi
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/MaterialExits"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MalzemeCikis" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-arrow-up-bold me-2"></i> Malzeme/Ürün Çıkışı
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
-                        <li>
-                            <a href="/Material" class='nav-link text-black @(ViewContext.RouteData.Values["controller"].ToString() == "Material" ? "active" : "")' style="height: 60px; display: flex; align-items: center;border-radius: 25px;">
-                                <i class="mdi mdi-package-variant me-2"></i>
-                                Malzeme/Ürün Tanımları
+
+                        <li class="nav-item">
+                            <a class="nav-link text-black"
+                               href="#raporlarSubmenu"
+                               data-bs-toggle="collapse"
+                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                <i class="mdi mdi-chart-bar me-2"></i> Raporlar
+                                <i class="mdi mdi-chevron-down ms-auto"></i>
                             </a>
-                        </li>
-                        <li>
-                            <a href="/CustomerTeam" class='nav-link text-black @(ViewContext.RouteData.Values["controller"].ToString() == "CustomerTeam" ? "active" : "")' style="height: 60px; display: flex; align-items: center;border-radius: 25px;">
-                                <i class="mdi mdi-account-group me-2"></i>
-                                Müşteri/Ekip Tanımları
-                            </a>
+                            <ul class="nav flex-column collapse @(
+                                    ViewContext.RouteData.Values["controller"].ToString() == "Reports"
+                                    ? "show" : "")"
+                                id="raporlarSubmenu">
+                                <li class="nav-item">
+                                    <a href="/Reports/CategoryHierarchy"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "CategoryHierarchy" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-file-tree me-2"></i> Kategori Hiyerarşisi
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Reports/MaterialListData"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialListData" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-format-list-bulleted me-2"></i> Malzeme Listesi
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Reports/MaterialEntryData"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialEntryData" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-inbox-arrow-down me-2"></i> Malzeme Giriş Verileri
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/Reports/MaterialOutData"
+                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialOutData" ? "active" : "")"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-inbox-arrow-up me-2"></i> Malzeme Çıkış Verileri
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
             </div>
 
-            <!-- Main content -->
             <div class="col-md-9 col-lg-10 ms-sm-auto p-4">
                 <main id="app">
                     @RenderBody()
@@ -94,27 +173,19 @@
         </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
-    <!-- Site JavaScript -->
     <script src="~/js/site.js"></script>
 
-    <!-- Sidebar active link handling -->
     <script>
         const sidebarLinks = document.querySelectorAll('#sidebarMenu .nav-link');
-
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                sidebarLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
+        sidebarLinks.forEach(l => {
+            l.addEventListener('click', () => {
+                sidebarLinks.forEach(x => x.classList.remove('active'));
+                l.classList.add('active');
             });
         });
     </script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

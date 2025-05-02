@@ -14,10 +14,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\DataEntryController.cs" />
+    <Compile Remove="Controllers\MalzemeGrubuController.cs" />
+    <Compile Remove="Controllers\StockEntriesController.cs" />
+    <Compile Remove="Controllers\StockExitsController.cs" />
     <Compile Remove="Views\NewFolder3\MalzemeGrubuTanımlama.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="appsettings.Development.json" />
+    <Content Remove="Views\MaterialEntries\MaterialOut.cshtml" />
     <Content Remove="Views\MaterialGroup\MalzemeGrubuTanımlama.cshtml" />
   </ItemGroup>
 
@@ -25,6 +31,26 @@
     <Folder Include="src\NewFolder\" />
     <Folder Include="Views\NewFolder2\" />
     <Folder Include="Views\NewFolder4\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="appsettings.Development.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
 
 </Project>

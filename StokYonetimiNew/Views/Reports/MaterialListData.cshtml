@@ -1,0 +1,226 @@
+﻿@{
+    ViewData["Title"] = "Malzeme Listesi";
+}
+<style>
+
+    .fs-7 {
+        font-size: 0.875rem !important;
+    }
+    /* 14px */
+    .fs-8 {
+        font-size: 0.75rem !important;
+    }
+    /* 12px */
+</style>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="reportMaterialListApp" class="container py-4" v-cloak>
+        <div class="d-flex justify-content-between mb-4">
+            <h2>@ViewData["Title"]</h2>
+            
+        </div>
+
+        <!-- Filtreler -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Filtreler</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Ana Kategori</label>
+                        <select class="form-select"
+                                v-model="filters.mainCategoryId"
+                                v-on:change="updateFilteredSubCategories">
+                            <option value="">Tümü</option>
+                            <option v-for="c in mainCategories" :key="c.id" :value="c.id">
+                                {{ c.code }} - {{ c.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Alt Kategori</label>
+                        <select class="form-select"
+                                v-model="filters.subCategoryId"
+                                v-on:change="updateFilteredMaterialTypes"
+                                :disabled="!filters.mainCategoryId">
+                            <option value="">Tümü</option>
+                            <option v-for="sc in filteredSubCategories" :key="sc.id" :value="sc.id">
+                                {{ sc.code }} - {{ sc.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Malzeme/Ürün Türü</label>
+                        <select class="form-select"
+                                v-model="filters.materialTypeId"
+                                :disabled="!filters.subCategoryId">
+                            <option value="">Tümü</option>
+                            <option v-for="mt in filteredMaterialTypes" :key="mt.id" :value="mt.id">
+                                {{ mt.code }} - {{ mt.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Malzeme/Ürün Adı</label>
+                        <input type="text" class="form-control"
+                               v-model="filters.materialName"
+                               placeholder="Ara..." />
+                    </div>
+                </div>
+                <div class="text-end">
+                    <button class="btn btn-outline-dark" v-on:click="applyFilters">
+                        <i class="mdi mdi-filter"></i> Filtrele
+                    </button>&nbsp;
+                    <button class="btn btn-dark" v-on:click="resetFilters">
+                        <i class="mdi mdi-filter-remove"></i> Filtreleri Temizle
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Malzeme Listesi Tablosu -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Malzeme Kodu</th>
+                        <th>Malzeme Adı</th>
+                        <th>Ölçü Birimi</th>
+                        <th>Kalan Malzeme Miktarı</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="m in filteredMaterials" :key="m.id">
+                        <td>{{ m.code }}</td>
+                        <td>{{ m.name }}</td>
+                        <td>{{ m.unit }}</td>
+                        <td>{{ calculateRemainingStock(m.id) }}</td>
+                    </tr>
+                    <tr v-if="filteredMaterials.length === 0">
+                        <td colspan="4" class="text-center">Bu kriterlere uygun malzeme bulunamadı.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="~/lib/vue.global.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            Vue.createApp({
+                data() {
+                    return {
+                        materials: [],
+                        mainCategories: [],
+                        subCategories: [],
+                        materialTypes: [],
+                        materialEntries: [],
+                        materialExits: [],
+                        filters: {
+                          mainCategoryId: '',
+                          subCategoryId: '',
+                          materialTypeId: '',
+                          materialName: ''
+                        },
+                        filteredMaterials: []
+                    };
+                },
+                computed: {
+                    filteredSubCategories() {
+                      if (!this.filters.mainCategoryId) return [];
+                      return this.subCategories.filter(sc =>
+                        sc.mainCategoryId == this.filters.mainCategoryId
+                      );
+                    },
+                    filteredMaterialTypes() {
+                      if (!this.filters.subCategoryId) return [];
+                      return this.materialTypes.filter(mt =>
+                        mt.subCategoryId == this.filters.subCategoryId
+                      );
+                    }
+                },
+                async mounted() {
+                    await this.loadData();
+                },
+                methods: {
+                    async loadData() {
+                        const [mRes, mcRes, scRes, mtRes, eInRes, eOutRes] = await Promise.all([
+                          axios.get('/api/MaterialsApi'),
+                          axios.get('/api/MainCategoriesApi'),
+                          axios.get('/api/SubCategoriesApi'),
+                          axios.get('/api/ProductTypesApi'),
+                          axios.get('/api/MaterialEntriesApi'),
+                          axios.get('/api/MaterialExitsApi')
+                        ]);
+                        this.materials       = mRes.data;
+                        this.mainCategories  = mcRes.data;
+                        this.subCategories   = scRes.data;
+                        this.materialTypes   = mtRes.data;
+                        this.materialEntries = eInRes.data;
+                        this.materialExits   = eOutRes.data;
+                        this.filteredMaterials = [...this.materials];
+                    },
+                    updateFilteredSubCategories() {
+                      this.filters.subCategoryId = '';
+                      this.filters.materialTypeId = '';
+                    },
+                    updateFilteredMaterialTypes() {
+                      this.filters.materialTypeId = '';
+                    },
+                    applyFilters() {
+                      let result = [...this.materials];
+                      const f = this.filters;
+                      if (f.materialTypeId) {
+                        result = result.filter(m => m.materialTypeId == f.materialTypeId);
+                      } else if (f.subCategoryId) {
+                        const types = this.materialTypes
+                          .filter(mt => mt.subCategoryId == f.subCategoryId)
+                          .map(mt => mt.id);
+                        result = result.filter(m => types.includes(m.materialTypeId));
+                      } else if (f.mainCategoryId) {
+                        const subs = this.subCategories
+                          .filter(sc => sc.mainCategoryId == f.mainCategoryId)
+                          .map(sc => sc.id);
+                        const types = this.materialTypes
+                          .filter(mt => subs.includes(mt.subCategoryId))
+                          .map(mt => mt.id);
+                        result = result.filter(m => types.includes(m.materialTypeId));
+                      }
+                      if (f.materialName.trim() !== '') {
+                        const q = f.materialName.toLowerCase();
+                        result = result.filter(m =>
+                          m.name.toLowerCase().includes(q) || m.code.toLowerCase().includes(q)
+                        );
+                      }
+                      this.filteredMaterials = result;
+                    },
+                    resetFilters() {
+                      this.filters = { mainCategoryId:'', subCategoryId:'', materialTypeId:'', materialName:'' };
+                      this.filteredMaterials = [...this.materials];
+                    },
+                    calculateRemainingStock(id) {
+                      const inQty = this.materialEntries
+                        .filter(e => e.materialId === id)
+                        .reduce((sum,e) => sum + e.quantity, 0);
+                      const outQty = this.materialExits
+                        .filter(e => e.materialId === id)
+                        .reduce((sum,e) => sum + e.quantity, 0);
+                      return inQty - outQty;
+                    },
+                    printReport() {
+                      window.print();
+                    }
+                }
+            }).mount('#reportMaterialListApp');
+        </script>
+    }
+</body>
+</html>

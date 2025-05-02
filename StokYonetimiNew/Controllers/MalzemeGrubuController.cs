@@ -6,7 +6,7 @@ namespace StokYonetimiNew.Controllers
     {
         public ActionResult Index()
         {
-            // Views/MaterialGroup klasörü altında MalzemeGrubuTanımlama.cshtml dosyası olmalı.
+            // Views/MaterialGroup klasörü altında MalzemeGrubuTanımlama.cshtml 
             return View("MalzemeGrubuTanımlama");
         }
     }

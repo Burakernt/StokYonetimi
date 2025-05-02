@@ -16,8 +16,10 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.js', '.vue'],
-        alias: { 'vue$': 'vue/dist/vue.esm.js' }
+        extensions: ['.js', '.vue', '.json'],
+        alias: {
+            vue$: 'vue/dist/vue.esm-bundler.js'
+        }
     },
     plugins: [new VueLoaderPlugin()],
     devServer: {
