@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StokYonetimiNew.Data;
+using StokYonetimiNew.Filters;
 using StokYonetimiNew.Models;
 
 namespace StokYonetimiNew.Controllers
@@ -11,10 +12,12 @@ namespace StokYonetimiNew.Controllers
     {
         private readonly StokContext _context;
         public ProductTypesApiController(StokContext context) => _context = context;
+        [RequireLogin(Roles = new[] { UserRole.Admin, UserRole.Reporter })]
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductType>>> Get()
             => await _context.ProductTypes.ToListAsync();
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
 
         [HttpPost]
         public async Task<ActionResult<ProductType>> Post([FromBody] ProductType pt)
@@ -29,6 +32,7 @@ namespace StokYonetimiNew.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { id = entity.Id }, entity);
         }
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] ProductType pt)
@@ -43,6 +47,7 @@ namespace StokYonetimiNew.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

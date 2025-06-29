@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StokYonetimiNew.Data;
+using StokYonetimiNew.Filters;
 using StokYonetimiNew.Models;
 
 
 namespace StokYonetimiNew.Controllers
 {
+    [RequireLogin(Roles = new[] { UserRole.Admin })]
     public class ProductTypesController : Controller
     {
         private readonly StokContext _context;

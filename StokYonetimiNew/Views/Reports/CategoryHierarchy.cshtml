@@ -115,27 +115,37 @@
 
               },
               methods: {
-                            async loadData() {
-              const [mc, sc, mt, m] = await Promise.all([
-                axios.get('/api/MainCategoriesApi'),
-                axios.get('/api/SubCategoriesApi'),
-                axios.get('/api/ProductTypesApi'),
-                axios.get('/api/MaterialsApi')
-              ]);
-              this.mainCategories = mc.data;
-              this.subCategories  = sc.data;
-              this.materialTypes  = mt.data;
-              this.materials      = m.data;
 
-              const allIds = [
-                ...this.mainCategories.map(c => c.id),
-                ...this.subCategories.map(s => s.id),
-                ...this.materialTypes.map(t => t.id)
-              ];
-              allIds.forEach(id => {
-                this.expanded[id] = false;
-              });
 
+
+                        async loadData() {
+              try {
+                const [mc, sc, mt, m] = await Promise.all([
+                  axios.get('/api/MainCategoriesApi'),
+                  axios.get('/api/SubCategoriesApi'),
+                  axios.get('/api/ProductTypesApi'),
+                  axios.get('/api/MaterialsApi')
+                ]);
+
+                this.mainCategories = mc?.data || [];
+                this.subCategories  = sc?.data || [];
+                this.materialTypes  = mt?.data || [];
+                this.materials      = m?.data || [];
+
+                const allIds = [
+                  ...this.mainCategories.map(c => c.id),
+                  ...this.subCategories.map(s => s.id),
+                  ...this.materialTypes.map(t => t.id)
+                ];
+
+                allIds.forEach(id => {
+                  this.expanded[id] = false;
+                });
+
+              } catch (err) {
+                console.error("Veriler yüklenirken hata:", err);
+                alert("Veriler alınamadı. Yetki sorunları veya sunucu hatası olabilir.");
+              }
             },
 
                 toggle(id) {

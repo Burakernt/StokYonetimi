@@ -6,6 +6,7 @@
 
     namespace StokYonetimiNew.Controllers
     {
+
         public class MainCategoriesController : Controller
         {
             private readonly StokContext _context;

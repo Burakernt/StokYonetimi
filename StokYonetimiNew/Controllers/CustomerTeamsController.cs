@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using StokYonetimiNew.Data;
+using StokYonetimiNew.Filters;
 using StokYonetimiNew.Models;
 
 namespace StokYonetimiNew.Controllers
 {
+    [RoleAuthorize(UserRole.Admin)]
     public class CustomerTeamsController : Controller
     {
         private readonly StokContext _context;

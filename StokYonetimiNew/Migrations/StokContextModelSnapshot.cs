@@ -211,6 +211,24 @@ namespace StokYonetimiNew.Migrations
                     b.ToTable("MaterialExits");
                 });
 
+            modelBuilder.Entity("StokYonetimiNew.Models.MeasurementUnit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MeasurementUnits");
+                });
+
             modelBuilder.Entity("StokYonetimiNew.Models.ProductType", b =>
                 {
                     b.Property<int>("Id")
@@ -410,6 +428,30 @@ namespace StokYonetimiNew.Migrations
                             Id = 7,
                             Name = "Kilometre"
                         });
+                });
+
+            modelBuilder.Entity("StokYonetimiNew.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("StokYonetimiNew.Models.Material", b =>

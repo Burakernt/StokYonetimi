@@ -19,6 +19,9 @@
         public DbSet<MaterialExit> MaterialExits { get; set; }
         public DbSet<StockExit> StockExits { get; set; }
         public DbSet<Department> Departments { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<MeasurementUnit> MeasurementUnits => Set<MeasurementUnit>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

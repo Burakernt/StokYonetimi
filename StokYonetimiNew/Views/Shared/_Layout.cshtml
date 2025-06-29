@@ -1,7 +1,29 @@
-﻿<style>
+﻿@using StokYonetimiNew.Models
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var username = HttpContextAccessor.HttpContext?.Session?.GetString("Username") ?? "Giriş yapılmadı";
+}
+
+@{
+    UserRole currentRole = UserRole.None;
+
+    if (HttpContextAccessor?.HttpContext?.Session != null)
+    {
+        var roleStr = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
+        Enum.TryParse<UserRole>(roleStr, out currentRole);
+    }
+
+
+    var ctrl = ViewContext.RouteData.Values["controller"]?.ToString();
+    var act = ViewContext.RouteData.Values["action"]?.ToString();
+    var isLoginPage = string.Equals(ctrl, "Account", StringComparison.OrdinalIgnoreCase)
+                   && string.Equals(act, "Login", StringComparison.OrdinalIgnoreCase);
+}
+
+<style>
     .nav-link.active {
-        background-color: black !important; /* örnek: siyah arkaplan */
-        color: #ffffff !important; /* yazı beyaz */
+        background-color: black !important;
+        color: #ffffff !important;
     }
 </style>
 <!DOCTYPE html>
@@ -20,151 +42,233 @@
     <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
+
 <body>
-
-
     <div class="container-fluid">
         <div class="row">
             <!-- sidebar -->
-            <div class="col-md-3 col-lg-2 p-0 bg-light sidebar">
-                <div class="d-flex flex-column flex-shrink-0 p-3 text-black vh-100"
-                     style="background-color:#fdfdfd; box-shadow:rgba(149,157,165,0.2) 0px 8px 24px;">
-                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"
-                       style="font-family:'Barlow'; font-size:132px; text-align:center;">
-                        <img src="/logo/ExLogo.png" alt="Logo" width="40" height="40" class="me-2" />
-                        <span class="fs-1">Örnek Hırdavat</span>
-                    </a>
-                    <hr>
-                    <ul class="nav nav-pills flex-column mb-auto" id="sidebarMenu">
-                        <li class="nav-item">
-                            <a href="/"
-                               class="nav-link text-black @(ViewContext.RouteData.Values["action"].ToString() == "Index" && ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active" : "")"
-                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                <i class="mdi mdi-home me-2"></i> Ana Sayfa
-                            </a>
-                        </li>
+            @if (!isLoginPage)
+            {
+                <div class="col-md-3 col-lg-2 p-0 bg-light sidebar">
+                    <div class="d-flex flex-column flex-shrink-0 p-3 text-black vh-100"
+                         style="background-color:#fdfdfd; box-shadow:rgba(149,157,165,0.2) 0px 8px 24px;">
+                        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none"
+                           style="font-family:'Barlow'; font-size:132px; text-align:center;">
+                            <img src="/logo/ExLogo.png" alt="Logo" width="40" height="40" class="me-2" />
+                            <span class="fs-1">Karasu Belediyesi</span>
+                        </a>
+                        <hr>
+                        <ul class="nav nav-pills flex-column mb-auto" id="sidebarMenu">
 
-                        <li class="nav-item">
-                            <a class="nav-link text-black"
-                               href="#tanımlamalarSubmenu"
-                               data-bs-toggle="collapse"
-                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                <i class="mdi mdi-database me-2"></i> Tanımlamalar
-                                <i class="mdi mdi-chevron-down ms-auto"></i>
-                            </a>
-                            <ul class="nav flex-column collapse @(
-                                    ViewContext.RouteData.Values["controller"].ToString() == "Suppliers" ||
-                                    ViewContext.RouteData.Values["controller"].ToString() == "MaterialGroup" ||
-                                    ViewContext.RouteData.Values["controller"].ToString() == "Materials" ||
-                                    ViewContext.RouteData.Values["controller"].ToString() == "CustomerTeams"
-                                    ? "show" : "")"
-                                id="tanımlamalarSubmenu">
-                                <li class="nav-item">
-                                    <a href="/Suppliers"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "Suppliers" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-truck me-2"></i> Tedarikçi Tanımları
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/MaterialGroup"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "MaterialGroup" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-folder me-2"></i> Malzeme Grup Tanımları
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Materials"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "Materials" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-package me-2"></i> Malzeme/Ürün Tanımları
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/CustomerTeams"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "CustomerTeams" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-account-group me-2"></i> Müşteri/Ekip Tanımları
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-black"
-                               href="#veriGirisSubmenu"
-                               data-bs-toggle="collapse"
-                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                <i class="mdi mdi-transfer me-2"></i> Veri Giriş/Çıkış
-                                <i class="mdi mdi-chevron-down ms-auto"></i>
-                            </a>
-                            <ul class="nav flex-column collapse @(
-                                    ViewContext.RouteData.Values["controller"].ToString() == "VeriGiris"
-                                    ? "show" : "")"
-                                id="veriGirisSubmenu">
-                                <li class="nav-item">
-                                    <a href="/MaterialEntries"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MalzemeGiris" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-arrow-down-bold me-2"></i> Malzeme/Ürün Girişi
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/MaterialExits"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MalzemeCikis" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-arrow-up-bold me-2"></i> Malzeme/Ürün Çıkışı
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-black"
-                               href="#raporlarSubmenu"
-                               data-bs-toggle="collapse"
-                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                <i class="mdi mdi-chart-bar me-2"></i> Raporlar
-                                <i class="mdi mdi-chevron-down ms-auto"></i>
+
+
+
+                            <!-- Herkese açık: Ana Sayfa -->
+                            <li class="nav-item">
+                                <a href="/"
+                                   class="nav-link text-black @(ViewContext.RouteData.Values["action"].ToString() == "Index" && ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active" : "")"
+                                   style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                    <i class="mdi mdi-home me-2"></i> Ana Sayfa
+                                </a>
+                            </li>
+
+                            @* Sadece Admin görebilecek: Tanımlamalar *@
+                            @if (currentRole == UserRole.Admin)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-black"
+                                       href="#tanımlamalarSubmenu"
+                                       data-bs-toggle="collapse"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-database me-2"></i> Tanımlamalar
+                                        <i class="mdi mdi-chevron-down ms-auto"></i>
+                                    </a>
+                                    <ul class="nav flex-column collapse @(
+                                        ViewContext.RouteData.Values["controller"].ToString() == "Suppliers" ||
+                                        ViewContext.RouteData.Values["controller"].ToString() == "MaterialGroup" ||
+                                        ViewContext.RouteData.Values["controller"].ToString() == "Materials" ||
+                                        ViewContext.RouteData.Values["controller"].ToString() == "CustomerTeams"
+                                        ? "show" : "")"
+                                        id="tanımlamalarSubmenu">
+                                        <li class="nav-item">
+                                            <a href="/Suppliers"
+                                               class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "Suppliers" ? "active" : "")"
+                                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-truck me-2"></i> Tedarikçi Tanımları
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/MaterialGroup"
+                                               class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "MaterialGroup" ? "active" : "")"
+                                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-folder me-2"></i> Malzeme Grup Tanımları
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/Materials"
+                                               class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "Materials" ? "active" : "")"
+                                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-package me-2"></i> Malzeme/Ürün Tanımları
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/CustomerTeams"
+                                               class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["controller"].ToString() == "CustomerTeams" ? "active" : "")"
+                                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-account-group me-2"></i> Müşteri/Ekip Tanımları
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+                            @{
+                                // MaterialEntries ve MaterialExits controller’larında submenu açık kalsın
+                                var showVeri = ctrl == "MaterialEntries" || ctrl == "MaterialExits";
+                            }
+                            <li class="nav-item">
+                                <a class="nav-link text-black"
+                                   href="#veriGirisSubmenu"
+                                   data-bs-toggle="collapse"
+                                   style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                    <i class="mdi mdi-transfer me-2"></i> Veri Giriş/Çıkış
+                                    <i class="mdi mdi-chevron-down ms-auto"></i>
+                                </a>
+                                <ul class="nav flex-column collapse @(showVeri ? "show" : "")"
+                                    id="veriGirisSubmenu">
+                                    <li class="nav-item">
+                                        <a href="/MaterialEntries"
+                                           class="nav-link text-black ms-3 @(ctrl == "MaterialEntries" ? "active" : "")"
+                                           style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                            <i class="mdi mdi-arrow-down-bold me-2"></i> Malzeme/Ürün Girişi
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="/MaterialExits"
+                                           class="nav-link text-black ms-3 @(ctrl == "MaterialExits" ? "active" : "")"
+                                           style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                            <i class="mdi mdi-arrow-up-bold me-2"></i> Malzeme/Ürün Çıkışı
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            @* Reporter veya Admin görebilecek: Raporlar *@
+                            @if (currentRole == UserRole.Admin || currentRole == UserRole.Reporter)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-black"
+                                       href="#raporlarSubmenu"
+                                       data-bs-toggle="collapse"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-chart-bar me-2"></i> Raporlar
+                                        <i class="mdi mdi-chevron-down ms-auto"></i>
+                                    </a>
+                                    <ul class="nav flex-column collapse @(
+                                        ViewContext.RouteData.Values["controller"].ToString() == "Reports"
+                                        ? "show" : "")"
+                                        id="raporlarSubmenu">
+                                        <li class="nav-item">
+                                            <a href="/Reports/CategoryHierarchy"
+                                               class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "CategoryHierarchy" ? "active" : "")"
+                                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-file-tree me-2"></i> Kategori Hiyerarşisi
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/Reports/MaterialListData"
+                                               class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialListData" ? "active" : "")"
+                                               style="
+                                     height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-format-list-bulleted me-2"></i> Malzeme Listesi
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/Reports/MaterialEntryData"
+                                               class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialEntryData" ? "active" : "")"
+                                               style="
+                                     height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-inbox-arrow-down me-2"></i> Malzeme Giriş Verileri
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="/Reports/MaterialOutData"
+                                               class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialOutData" ? "active" : "")"
+                                               style="
+                                     height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-inbox-arrow-up me-2"></i> Malzeme Çıkış Verileri
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                            }
+
+
+
+
+
+
+                            @if (currentRole == UserRole.Admin)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-black"
+                                       href="#sistemTanımlamaSubmenu"
+                                       data-bs-toggle="collapse"
+                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                        <i class="mdi mdi-cogs me-2"></i> Sistem Tanımlamaları
+                                        <i class="mdi mdi-chevron-down ms-auto"></i>
+                                    </a>
+
+                                    @{
+                                        var isSistemSubmenuOpen = ctrl == "MeasurementUnits" || ctrl == "Users";
+                                    }
+
+                                    <ul class="nav flex-column collapse @(isSistemSubmenuOpen ? "show" : "")"
+                                        id="sistemTanımlamaSubmenu">
+
+                                        <li class="nav-item">
+                                            <a href="/SystemDefinitions/MeasurementUnits"
+                                               class="nav-link text-black ms-3 @(ctrl == "MeasurementUnits" ? "active" : "")"
+                                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-scale-balance me-2"></i> Ölçü Birimi Tanımlama
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/Users"
+                                               class="nav-link text-black ms-3 @(ctrl == "Users" ? "active" : "")"
+                                               style="height:60px; display:flex; align-items:center; border-radius:25px;">
+                                                <i class="mdi mdi-account-cog me-2"></i> Kullanıcı Yönetimi
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+
+
+
+
+
+
+                        </ul>
+                        
+                        <!-- ÇIKIŞ & KULLANICI BİLGİSİ - En alt -->
+                        <div class="d-flex align-items-center mt-3 border-top pt-3">
+                            <i class="mdi mdi-account-circle fs-4 me-2"></i>
+                            <span class="me-auto">@username</span>
+                            <a href="/Account/Logout" class="btn btn-outline-danger btn-sm">
+                                <i class="mdi mdi-logout"></i> Çıkış
                             </a>
-                            <ul class="nav flex-column collapse @(
-                                    ViewContext.RouteData.Values["controller"].ToString() == "Reports"
-                                    ? "show" : "")"
-                                id="raporlarSubmenu">
-                                <li class="nav-item">
-                                    <a href="/Reports/CategoryHierarchy"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "CategoryHierarchy" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-file-tree me-2"></i> Kategori Hiyerarşisi
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Reports/MaterialListData"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialListData" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-format-list-bulleted me-2"></i> Malzeme Listesi
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Reports/MaterialEntryData"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialEntryData" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-inbox-arrow-down me-2"></i> Malzeme Giriş Verileri
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Reports/MaterialOutData"
-                                       class="nav-link text-black ms-3 @(ViewContext.RouteData.Values["action"].ToString() == "MaterialOutData" ? "active" : "")"
-                                       style="height:60px; display:flex; align-items:center; border-radius:25px;">
-                                        <i class="mdi mdi-inbox-arrow-up me-2"></i> Malzeme Çıkış Verileri
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
-
+            }
+            <!-- main content -->
             <div class="col-md-9 col-lg-10 ms-sm-auto p-4">
                 <main id="app">
                     @RenderBody()
@@ -173,11 +277,15 @@
         </div>
     </div>
 
+    <!-- Bootstrap Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Site JS -->
     <script src="~/js/site.js"></script>
 
     <script>
+        // Sidebar active link highlight
         const sidebarLinks = document.querySelectorAll('#sidebarMenu .nav-link');
         sidebarLinks.forEach(l => {
             l.addEventListener('click', () => {
@@ -186,6 +294,6 @@
             });
         });
     </script>
-    @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

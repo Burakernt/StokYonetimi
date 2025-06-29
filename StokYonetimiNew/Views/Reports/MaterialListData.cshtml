@@ -74,7 +74,13 @@
                                placeholder="Ara..." />
                     </div>
                 </div>
+                
+
                 <div class="text-end">
+                    <button class="btn btn-success" v-on:click="exportToExcel">
+                        <i class="mdi mdi-file-excel"></i> Excel'e Aktar
+                    </button>  &nbsp;
+
                     <button class="btn btn-outline-dark" v-on:click="applyFilters">
                         <i class="mdi mdi-filter"></i> Filtrele
                     </button>&nbsp;
@@ -112,8 +118,11 @@
     </div>
 
     @section Scripts {
+
         <script src="~/lib/vue.global.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
         <script>
             Vue.createApp({
                 data() {
@@ -151,6 +160,25 @@
                     await this.loadData();
                 },
                 methods: {
+
+                                exportToExcel() {
+                const wsData = [
+                    ["Malzeme Kodu", "Malzeme Adı", "Ölçü Birimi", "Kalan Miktar"]
+                ];
+                this.filteredMaterials.forEach(m => {
+                    wsData.push([
+                        m.code,
+                        m.name,
+                        m.unit,
+                        this.calculateRemainingStock(m.id)
+                    ]);
+                });
+
+                const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Malzeme Listesi");
+                XLSX.writeFile(workbook, "malzeme_listesi.xlsx");
+            },
                     async loadData() {
                         const [mRes, mcRes, scRes, mtRes, eInRes, eOutRes] = await Promise.all([
                           axios.get('/api/MaterialsApi'),

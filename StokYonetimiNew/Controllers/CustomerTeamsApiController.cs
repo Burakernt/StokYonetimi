@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StokYonetimiNew.Data;
+using StokYonetimiNew.Filters;
 using StokYonetimiNew.Models;
 
 namespace StokYonetimiNew.Controllers
@@ -13,11 +14,15 @@ namespace StokYonetimiNew.Controllers
         public CustomerTeamsApiController(StokContext context) => _context = context;
 
         // GET api/CustomerTeamsApi
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CustomerTeam>>> Get()
             => await _context.CustomerTeams.ToListAsync();
 
         // GET api/CustomerTeamsApi/5
+        [RequireLogin(Roles = new[] { UserRole.Admin, UserRole.Reporter })]
+
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerTeam>> Get(int id)
         {
@@ -27,6 +32,8 @@ namespace StokYonetimiNew.Controllers
         }
 
         // POST api/CustomerTeamsApi
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
+
         [HttpPost]
         public async Task<ActionResult<CustomerTeam>> Post(CustomerTeam t)
         {
@@ -36,6 +43,8 @@ namespace StokYonetimiNew.Controllers
         }
 
         // PUT api/CustomerTeamsApi/5
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, CustomerTeam t)
         {
@@ -52,6 +61,8 @@ namespace StokYonetimiNew.Controllers
         }
 
         // DELETE api/CustomerTeamsApi/5
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

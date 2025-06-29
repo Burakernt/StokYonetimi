@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StokYonetimiNew.Data;
+using StokYonetimiNew.Filters;
 using StokYonetimiNew.Models;
 
 namespace StokYonetimiNew.Controllers
@@ -11,6 +12,7 @@ namespace StokYonetimiNew.Controllers
     {
         private readonly StokContext _context;
         public MaterialsApiController(StokContext context) => _context = context;
+        [RequireLogin(Roles = new[] { UserRole.Admin, UserRole.Reporter })]
 
         // GET: api/MaterialsApi
         [HttpGet]
@@ -23,6 +25,7 @@ namespace StokYonetimiNew.Controllers
                 .ToListAsync();
             return Ok(materials);
         }
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
 
         // POST: api/MaterialsApi
         [HttpPost]
@@ -36,6 +39,7 @@ namespace StokYonetimiNew.Controllers
             // CreatedAtAction ile 201 dönüyoruz
             return CreatedAtAction(nameof(Get), new { id = m.Id }, m);
         }
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
 
         // PUT: api/MaterialsApi/5
         [HttpPut("{id}")]
@@ -62,6 +66,7 @@ namespace StokYonetimiNew.Controllers
 
             return NoContent();
         }
+        [RequireLogin(Roles = new[] { UserRole.Admin })]
 
         // DELETE: api/MaterialsApi/5
         [HttpDelete("{id}")]

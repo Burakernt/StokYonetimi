@@ -1,0 +1,229 @@
+﻿@model StokYonetimiNew.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Giriş Yap";
+    Layout = "_Layout";
+}
+
+<style>
+    body {
+        background: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    .wrapper {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .outer-card {
+        position: relative;
+        width: 1000px;
+        height: 600px;
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        z-index: 1111;
+        box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+        border: 2px solid red;
+    }
+
+    .outer-card-glass {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        z-index: 2;
+        background: rgba(255, 255, 255, .95);
+        backdrop-filter: blur(24px);
+        border-radius: 16px;
+        outline: 2px solid white;
+    }
+
+
+
+
+
+    .outer-card-left,
+    .outer-card-right {
+        width: 50%;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 30px;
+    }
+
+    .outer-card-left {
+        background-image: url('/Patterns/CargoPatternBlack.png');
+        background-size: cover;
+        color: white;
+    }
+
+    .logo-circle {
+        width: 100px;
+        height: 100px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+        .logo-circle img {
+            width: 80%;
+            height: auto;
+        }
+
+    .outer-card-left span {
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .flip-card__inner {
+        width: 380px;
+        height: 430px;
+        text-align: center;
+        position: relative;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        border-radius: 80px;
+    }
+
+    .flip-card__front,
+    .flip-card__back {
+        padding: 20px;
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        backface-visibility: hidden;
+        background: white;
+        gap: 20px;
+        border-radius: 20px;
+        width: 100%;
+        height: 100%;
+    }
+
+    .flip-card__back {
+        transform: rotateY(180deg);
+    }
+
+
+
+
+
+    .title {
+        margin: 20px 0;
+        font-size: 30px;
+        font-weight: 900;
+        color: #323232;
+    }
+
+    .flip-card__input {
+        width: 100%;
+        height: 45px;
+        border-radius: 5px;
+        border: 2px solid #323232;
+        background: white;
+        box-shadow: 4px 4px #323232;
+        font-size: 16px;
+        font-weight: 600;
+        color: #323232;
+        padding: 5px 10px;
+        outline: none;
+    }
+
+        .flip-card__input::placeholder {
+            color: #666;
+            opacity: 0.8;
+        }
+
+
+
+    .flip-card__btn {
+        margin-top: 15px;
+        width: 100%;
+        height: 45px;
+        border-radius: 5px;
+        border: 2px solid #323232;
+        background: white;
+        box-shadow: 4px 4px #323232;
+        font-size: 17px;
+        font-weight: 600;
+        color: #323232;
+        cursor: pointer;
+    }
+
+        .flip-card__btn:active {
+            box-shadow: none;
+            transform: translate(2px, 2px);
+        }
+
+    label.form-label {
+        display: block;
+        text-align: left;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+</style>
+
+<div class="wrapper">
+    <div class="outer-card">
+        <div class="blob"></div>
+        <div class="outer-card-glass"></div>
+
+        <div class="outer-card-left">
+            <div class="logo-circle">
+                <img src="/logo/ExLogo.png" alt="Logo" />
+            </div>
+            <span>Karasu Belediyesi</span>
+        </div>
+
+        <div class="outer-card-right">
+            <div class="card-switch">
+                <label class="switch">
+                    <div class="flip-card__inner">
+                        <div class="flip-card__front">
+                            <div class="title">Stok Yönetimi Giriş</div>
+                            <form asp-controller="Account" asp-action="Login" method="post">
+                                @Html.AntiForgeryToken()
+                                <div asp-validation-summary="All" class="text-danger small"></div>
+
+                                <div class="mb-3">
+                                    <label for="Username" class="form-label fs-5">Kullanıcı Adı</label>
+                                    <input asp-for="Username" class="flip-card__input" placeholder="Kullanıcı Adı" />
+                                    <span asp-validation-for="Username" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="Password" class="form-label fs-5">Parola</label>
+                                    <input asp-for="Password" type="password" class="flip-card__input" placeholder="Parola" />
+                                    <span asp-validation-for="Password" class="text-danger small"></span>
+                                </div>
+
+                                <button type="submit" class="flip-card__btn">Giriş Yap</button>
+                            </form>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

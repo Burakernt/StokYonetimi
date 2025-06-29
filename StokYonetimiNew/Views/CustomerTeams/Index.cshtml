@@ -1,270 +1,253 @@
 @{
     ViewData["Title"] = "Müşteri/Ekip Yönetimi";
 }
-<style> 
-
-    .fs-7 {
-        font-size: 0.875rem !important;
-    }
-    /* 14px */
-    .fs-8 {
-        font-size: 0.75rem !important;
-    }
-    /* 12px */
-</style>
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <title>@ViewData["Title"]</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .fs-7 {
+            font-size: .875rem !important;
+        }
+
+        .fs-8 {
+            font-size: .75rem !important;
+        }
+
+        .btn-outline-dark.active {
+            background-color: #212529;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
     <div id="app" class="container py-4" v-cloak>
-    <h2>@ViewData["Title"]</h2>
-    <div class="row">
-      <!-- LEFT: Departments -->
-      <div class="col-lg-6 mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="h5 mb-0">Departmanlar</span>
-                    <button class="btn btn-dark btn-sm" v-on:click="showDeptForm()">
-            <i class="mdi mdi-plus"></i> Yeni
-          </button>
-        </div>
-        <div class="card shadow-sm mb-4">
-          <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-                <tr><th>Departman Adı</th><th class="text-end">İşlemler</th></tr>
-              </thead>
-              <tbody>
-                <tr v-for="d in departments" :key="d.id">
-                  <td>{{ d.name }}</td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-light border-dark me-1"
-                                                v-on:click="showDeptForm(d)">
-                      <i class="mdi mdi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger border-dark"
-                                                v-on:click="confirmDeleteDept(d)">
-                      <i class="mdi mdi-delete"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="!departments.length">
-                  <td colspan="2" class="text-center py-3">Hiç departman yok</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+        <h2>@ViewData["Title"]</h2>
 
-      <!-- RIGHT: CustomerTeams -->
-      <div class="col-lg-6 mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="h5 mb-0">Ekipler</span>
-                    <button class="btn btn-dark btn-sm" v-on:click="showTeamForm()">
-            <i class="mdi mdi-plus"></i> Yeni
-          </button>
-        </div>
-        <div class="card shadow-sm">
-          <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Departman</th><th>Ekip Adı</th><th class="text-end">İşlemler</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="t in teams" :key="t.id">
-                  <td>{{ t.department }}</td>
-                  <td>{{ t.teamName }}</td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-light border-dark me-1"
-                                                v-on:click="showTeamForm(t)">
-                      <i class="mdi mdi-pencil"></i>
+        <div class="row">
+            <!-- Departmanlar -->
+            <div class="col-lg-6 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="h5 mb-0">Departmanlar</span>
+                    <button class="btn btn-outline-dark btn-sm" v-on:click="showDeptForm()">
+                        <i class="mdi mdi-plus"></i> Yeni
                     </button>
-                    <button class="btn btn-sm btn-danger border-dark"
-                                                v-on:click="confirmDeleteTeam(t)">
-                      <i class="mdi mdi-delete"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="!teams.length">
-                  <td colspan="3" class="text-center py-3">Hiç ekip yok</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+                </div>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0 fs-7">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Departman Adı</th>
+                                    <th class="text-end fs-8">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="d in departments" :key="d.id">
+                                    <td>{{ d.name }}</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-light me-1" v-on:click="showDeptForm(d)">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" v-on:click="confirmDeleteDept(d)">
+                                            <i class="mdi mdi-delete"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-if="!departments.length">
+                                    <td colspan="2" class="text-center py-3">Hiç departman yok</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Dept Modal -->
-    <div class="modal fade" id="deptModal" tabindex="-1">
-      <div class="modal-dialog">
+            <!-- Ekipler -->
+            <div class="col-lg-6 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="h5 mb-0">Ekipler</span>
+                    <button class="btn btn-outline-dark btn-sm" v-on:click="showTeamForm()">
+                        <i class="mdi mdi-plus"></i> Yeni
+                    </button>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0 fs-7">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Birim</th>
+                                    <th>Ekip Adı</th>
+                                    <th class="text-end fs-8">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="t in teams" :key="t.id">
+                                    <td>{{ t.department }}</td>
+                                    <td>{{ t.teamName }}</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-light me-1" v-on:click="showTeamForm(t)">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" v-on:click="confirmDeleteTeam(t)">
+                                            <i class="mdi mdi-delete"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-if="!teams.length">
+                                    <td colspan="3" class="text-center py-3">Hiç ekip yok</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dept Modal -->
+        <div class="modal fade" id="deptModal" tabindex="-1">
+            <div class="modal-dialog">
                 <form class="modal-content" v-on:submit.prevent="saveDepartment">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ editingDept ? 'Departman Düzenle' : 'Yeni Departman' }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <label class="form-label">Departman Adı *</label>
-            <input v-model="currentDept.name" class="form-control" required>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-            <button class="btn btn-primary" type="submit">Kaydet</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Team Modal -->
-    <div class="modal fade" id="teamModal" tabindex="-1">
-      <div class="modal-dialog">
-                <form class="modal-content" v-on:submit.prevent="saveTeam">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ editingTeam ? 'Ekip Düzenle' : 'Yeni Ekip' }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <label class="form-label">Departman *</label>
-            <select v-model="currentTeam.department" class="form-select" required>
-              <option value="">Seçiniz</option>
-              <option v-for="d in departments" :value="d">{{ d }}</option>
-            </select>
-            <label class="form-label mt-3">Ekip Adı *</label>
-            <input v-model="currentTeam.teamName" class="form-control" maxlength="100" required>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-            <button class="btn btn-primary" type="submit">Kaydet</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Delete Confirm Modal  -->
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header"><h5 class="modal-title">Sil Onayı</h5>
-            <button class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body"><p>{{ deleteMessage }}</p></div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" data-bs-dismiss="modal">Hayır</button>
-            <button class="btn btn-danger" v-on:click="confirmDelete">Evet</button>
-          </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ editingDept ? 'Departman Düzenle' : 'Yeni Departman' }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Departman Adı *</label>
+                        <input v-model="currentDept.name" class="form-control" required />
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                        <button class="btn btn-outline-dark" type="submit">Kaydet</button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
+
+        <!-- Team Modal -->
+        <div class="modal fade" id="teamModal" tabindex="-1">
+            <div class="modal-dialog">
+                <form class="modal-content" v-on:submit.prevent="saveTeam">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ editingTeam ? 'Ekip Düzenle' : 'Yeni Ekip' }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Departman *</label>
+                        <select v-model="currentTeam.department" class="form-select mb-3" required>
+                            <option value="">Seçiniz</option>
+                            <option v-for="d in departments" :key="d.id" :value="d.name">{{ d.name }}</option>
+                        </select>
+                        <label class="form-label">Ekip Adı *</label>
+                        <input v-model="currentTeam.teamName" class="form-control" maxlength="100" required />
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                        <button class="btn btn-outline-dark" type="submit">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Delete Confirm Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
+                        <p>{{ deleteMessage }}</p>
+                        <button class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Hayır</button>
+                        <button class="btn btn-danger" v-on:click="confirmDelete">Evet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-  </div>
 
-  @section Scripts {
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="~/lib/vue.global.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-  const app = Vue.createApp({
-    data() {
-      return {
-        departments: [],
-        teams: [],
-        allTeams: [],
-        currentDept: { id:0, name:'' },
-        editingDept: false,
-        currentTeam: { id:0, department:'', teamName:'' },
-        editingTeam: false,
-        deleteTarget: null,
-        deleteType: '',  
-        deleteMessage: '',
-        deptModal: null,
-        teamModal: null,
-        deleteModal: null
-      }
-    },
-    async mounted(){
-      this.deptModal   = new bootstrap.Modal(document.getElementById('deptModal'));
-      this.teamModal   = new bootstrap.Modal(document.getElementById('teamModal'));
-      this.deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-      await this.loadAll();
-    },
-    methods:{
-      
-      async loadAll(){
-        const [dRes,tRes] = await Promise.all([
-          axios.get('/api/DepartmentsApi'),
-          axios.get('/api/CustomerTeamsApi')
-        ]);
-            this.departments = dRes.data 
-            this.allTeams    = tRes.data;
-        this.teams       = this.allTeams;
-      },
-
-      // DEPARTMENTS:
-      showDeptForm(d=null){
-        this.editingDept = !!d;
-        this.currentDept = d
-          ? { ...d }
-          : { id:0, name:'' };
-        this.deptModal.show();
-      },
-      async saveDepartment(){
-        if(this.editingDept){
-          await axios.put(`/api/DepartmentsApi/${this.currentDept.id}`, this.currentDept);
-        } else {
-          await axios.post('/api/DepartmentsApi', this.currentDept);
-        }
-        this.deptModal.hide();
-        await this.loadAll();
-      },
-      confirmDeleteDept(d){
-        this.deleteType = 'dept';
-        this.deleteTarget = d;
-        this.deleteMessage = `"${d.name}" silinsin mi?`;
-        this.deleteModal.show();
-      },
-
-      // TEAMS:
-      showTeamForm(t=null){
-        this.editingTeam = !!t;
-        this.currentTeam = t
-          ? { ...t }
-          : { id:0, department:'', teamName:'' };
-        this.teamModal.show();
-      },
-      async saveTeam(){
-        if(this.editingTeam){
-          await axios.put(`/api/CustomerTeamsApi/${this.currentTeam.id}`, this.currentTeam);
-        } else {
-          await axios.post('/api/CustomerTeamsApi', this.currentTeam);
-        }
-        this.teamModal.hide();
-        await this.loadAll();
-      },
-      confirmDeleteTeam(t){
-        this.deleteType = 'team';
-        this.deleteTarget = t;
-        this.deleteMessage = `"${t.teamName}" silinsin mi?`;
-        this.deleteModal.show();
-      },
-
-      // DELETE handler
-      async confirmDelete(){
-        if(this.deleteType==='dept'){
-          await axios.delete(`/api/DepartmentsApi/${this.deleteTarget.id}`);
-        } else {
-          await axios.delete(`/api/CustomerTeamsApi/${this.deleteTarget.id}`);
-        }
-        this.deleteModal.hide();
-        await this.loadAll();
-      }
+    @section Scripts {
+        <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            const app = Vue.createApp({
+              data() {
+                return {
+                  departments: [], teams: [], allTeams: [],
+                  currentDept: { id:0, name:'' }, editingDept: false,
+                  currentTeam: { id:0, department:'', teamName:'' }, editingTeam: false,
+                  deleteTarget: null, deleteType:'', deleteMessage:'',
+                  deptModal:null, teamModal:null, deleteModal:null
+                };
+              },
+              async mounted() {
+                this.deptModal   = new bootstrap.Modal('#deptModal');
+                this.teamModal   = new bootstrap.Modal('#teamModal');
+                this.deleteModal = new bootstrap.Modal('#deleteModal');
+                await this.loadAll();
+              },
+              methods: {
+                async loadAll() {
+                  const [dRes,tRes] = await Promise.all([
+                    axios.get('/api/DepartmentsApi'),
+                    axios.get('/api/CustomerTeamsApi')
+                  ]);
+                  this.departments = dRes.data;
+                  this.allTeams    = tRes.data;
+                  this.teams       = this.allTeams;
+                },
+                showDeptForm(d=null) {
+                  this.editingDept = !!d;
+                  this.currentDept = d ? {...d} : { id:0, name:'' };
+                  this.deptModal.show();
+                },
+                async saveDepartment() {
+                  console.log('POST dept:', this.currentDept);
+                  if (this.editingDept)
+                    await axios.put(`/api/DepartmentsApi/${this.currentDept.id}`, this.currentDept);
+                  else
+                    await axios.post('/api/DepartmentsApi', this.currentDept);
+                  this.deptModal.hide();
+                  await this.loadAll();
+                },
+                confirmDeleteDept(d) {
+                  this.deleteType    = 'dept';
+                  this.deleteTarget  = d;
+                  this.deleteMessage = `"${d.name}" silinsin mi?`;
+                  this.deleteModal.show();
+                },
+                showTeamForm(t=null) {
+                  this.editingTeam = !!t;
+                  this.currentTeam = t ? {...t} : { id:0, department:'', teamName:'' };
+                  this.teamModal.show();
+                },
+                async saveTeam() {
+                  console.log('POST team:', this.currentTeam);
+                  if (this.editingTeam)
+                    await axios.put(`/api/CustomerTeamsApi/${this.currentTeam.id}`, this.currentTeam);
+                  else
+                    await axios.post('/api/CustomerTeamsApi', this.currentTeam);
+                  this.teamModal.hide();
+                  await this.loadAll();
+                },
+                confirmDeleteTeam(t) {
+                  this.deleteType    = 'team';
+                  this.deleteTarget  = t;
+                  this.deleteMessage = `"${t.teamName}" silinsin mi?`;
+                  this.deleteModal.show();
+                },
+                async confirmDelete() {
+                  if (this.deleteType==='dept')
+                    await axios.delete(`/api/DepartmentsApi/${this.deleteTarget.id}`);
+                  else
+                    await axios.delete(`/api/CustomerTeamsApi/${this.deleteTarget.id}`);
+                  this.deleteModal.hide();
+                  await this.loadAll();
+                }
+              }
+            }).mount('#app');
+        </script>
     }
-  }).mount('#app')
-  </script>
-  }
 </body>
 </html>

@@ -31,6 +31,7 @@
     <Folder Include="src\NewFolder\" />
     <Folder Include="Views\NewFolder2\" />
     <Folder Include="Views\NewFolder4\" />
+    <Folder Include="wwwroot\Patterns\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
